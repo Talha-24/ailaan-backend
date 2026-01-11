@@ -16,20 +16,21 @@ const supabase=createClient(process.env.SUPABASE_URL,process.env.SUPABASE_SERVIC
 
 app.get("/products/view-all/:category",async(req,res)=>{
 
-    const category=await req.params;
-    console.log("ERROR ",category);
+    const {category}= req.params;
+
 
     const {data,error}=await supabase.from("products").select("*").eq("product_category",category);
+
 
     if(data){
         return res.json({data:data,success:true, message: "Data is retrieved successfully"});
     }
 
     if(error){
-        return res.statusCode(500).json({data:null, success:false, message: error.message});
+        return res.json({data,success:true, message: error.message});
     }
 
-
+   
 
 })
 
@@ -58,6 +59,25 @@ app.post("/products/create",async(req,res)=>{
     }
 
 })
+
+
+app.get("/products/view-one/:id",async(req,res)=>{
+    const {id}=req.params;
+
+    const {data,error}=await supabase.from("products").select(`*,product_owners(*)`).eq("id",id).maybeSingle();
+
+    if(data){
+        return res.json({data,success:true, message: "Data is retrieved successfully"});
+    }
+    if(error){
+        return res.status(500).json({success:false, data: [],message: error.message});
+    }
+
+})
+
+
+
+
 
 app.post("/owners/create",async(req,res)=>{
 
